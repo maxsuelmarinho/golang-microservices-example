@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/service"
+	service "github.com/maxsuelmarinho/golang-microservices-example/accountservice/service"
 )
 
 var appName = "accountservice"
