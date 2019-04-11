@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os/user"
+	"path/filepath"
 	"strconv"
 
 	"github.com/boltdb/bolt"
@@ -24,7 +26,9 @@ type BoltClient struct {
 
 func (bc *BoltClient) OpenBoltDb() {
 	var err error
-	bc.boltDB, err = bolt.Open("accounts.db", 0600, nil)
+	currentUser, err := user.Current()
+	dataPath := filepath.Join(currentUser.HomeDir, "accounts.db")
+	bc.boltDB, err = bolt.Open(dataPath, 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
