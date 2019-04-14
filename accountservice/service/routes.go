@@ -18,4 +18,16 @@ var routes = Routes{
 		"/accounts/{accountId}",
 		GetAccount,
 	},
+	Route{
+		"HealthCheck",
+		"GET",
+		"/health",
+		HealthCheck,
+	},
+	Route{
+		"Testability",
+		"POST",
+		"/testability/healthy/{state}",
+		SetHealthyState,
+	},
 }

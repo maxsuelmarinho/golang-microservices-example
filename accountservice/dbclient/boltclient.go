@@ -18,6 +18,7 @@ type IBoltClient interface {
 	OpenBoltDb()
 	QueryAccount(accountId string) (model.Account, error)
 	Seed()
+	Check() bool
 }
 
 type BoltClient struct {
@@ -29,6 +30,7 @@ func (bc *BoltClient) OpenBoltDb() {
 	currentUser, err := user.Current()
 	dataPath := filepath.Join(currentUser.HomeDir, "accounts.db")
 	bc.boltDB, err = bolt.Open(dataPath, 0600, nil)
+	//bc.boltDB, err = bolt.Open("accounts.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,4 +92,8 @@ func (bc *BoltClient) QueryAccount(accountID string) (model.Account, error) {
 	}
 
 	return account, nil
+}
+
+func (bc *BoltClient) Check() bool {
+	return bc.boltDB != nil
 }
