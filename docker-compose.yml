@@ -1,0 +1,41 @@
+version: '3.1'
+
+networks:
+  my_network:
+
+services:
+  account-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile-accountservice
+    image: "maxsuelmarinho/golang-microservices-example:accountservice-0.0.1"
+    container_name: "account-service"
+    ports:
+      - "8080:8080"
+    networks:
+      - my_network
+    depends_on: 
+      - quotes-service
+    links:
+      - quotes-service
+
+  quotes-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile-quotesservice
+    image: "maxsuelmarinho/golang-microservices-example:quotesservice-0.0.1"
+    container_name: "quotes-service"
+    ports:
+      - "9090:8080"
+    networks:
+      - my_network
+
+  viz:
+    image: "dockersamples/visualizer"
+    container_name: "viz"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "8000:8080"
+    networks:
+      - my_network
