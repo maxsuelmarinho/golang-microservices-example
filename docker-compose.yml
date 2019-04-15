@@ -10,6 +10,9 @@ services:
       dockerfile: Dockerfile-accountservice
     image: "maxsuelmarinho/golang-microservices-example:accountservice-0.0.1"
     container_name: "account-service"
+    environment:
+      - CONFIG_USER=${CONFIG_USER}
+      - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
       - "8080:8080"
     networks:
@@ -25,6 +28,9 @@ services:
       dockerfile: Dockerfile-quotesservice
     image: "maxsuelmarinho/golang-microservices-example:quotesservice-0.0.1"
     container_name: "quotes-service"
+    environment:
+      - CONFIG_USER=${CONFIG_USER}
+      - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
       - "9090:8080"
     networks:
@@ -39,3 +45,21 @@ services:
       - "8000:8080"
     networks:
       - my_network
+
+  config-server:
+    image:
+    container_name: config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,native
+      - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config-repo
+      #- SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME=${CONFIG_SERVER_GIT_USERNAME}
+      #- SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=${CONFIG_SERVER_GIT_PASSWORD}
+      - SECURITY_USER_NAME=${CONFIG_USER}
+      - SECURITY_USER_PASSWORD=${CONFIG_PASSWORD}
+    volumes:
+      - ./config-repo:/config-repo
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"

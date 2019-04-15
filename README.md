@@ -91,6 +91,37 @@ To add a worker to this swarm, run the following command:
     docker swarm join --token SWMTKN-1-0ljalif9jf9grmlm1hbewplgj44wh6t2wt44n1wfrrxypxlo7o-55jcgul49od8nuvloo9vu9zs2 192.168.99.100:2377
 ```
 
+**List nodes**
+
+```
+docker node ls
+```
+**Unregister worker nodes**
+
+```
+for i in $(seq "${NUM_WORKERS}"); do
+   docker --host=localhost:${i}2375 swarm leave
+done
+```
+
+**Leave swarm mode**
+
+```
+docker swarm leave --force
+```
+
+**Remove container by name**
+
+```
+docker rm -f $(docker ps --filter name=quotes-service -q)
+```
+
+**Remove container by base image**
+
+```
+docker rm -f $(docker ps -a -q --filter ancestor=docker:${DOCKER_VERSION} --format="")
+```
+
 **Create an overlay network**
 
 ```
@@ -174,4 +205,53 @@ docker service create --constraint=node.role==manager --replicas 1 --name dvizz 
   "id": "10000",
   "name": "Person_0"
 }
+```
+
+## Configuration Server
+
+**Get Configurations**
+
+```
+> curl -ks https://<config-user>:<config-password>@localhost:8888/application/default | jq
+
+curl -ks https://<config-user>:<config-password>@localhost:8888/account-service/docker | jq
+```
+
+**Creating a Key Store**
+
+```
+keytool -genkeypair \
+  -alias mytestkey \
+  -keyalg RSA \
+  -dname "CN=Microservices Example,OU=Unit,O=Organization,L=City,S=State,C=BR" \
+  -keypass changeme \
+  -keystore server.jks \
+  -storepass letmein
+  -validity 730
+```
+
+**Encrypt data**
+
+```
+curl -ks https://<config-user>:<config-password>@localhost:8888/encrypt -d my-data
+```
+
+**Decrypt data**
+
+```
+curl -ks https://<config-user>:<config-password>@localhost:8888/decrypt -d acbf87acb77acbf9879
+```
+
+**Encrypt property**
+
+```
+my.secret.property='{cipher}acbf87acb77acbf9879'
+```
+
+**Simulate push notifications locally**
+
+```
+curl -H "X-Github-Event: push" -H "Content-Type: application/json" \
+   -X POST -d '{"commits": [{"modified": ["account-service.yml"]}]}' \
+   -ks https://<config-user>:<config-password>@localhost:8888/monitor
 ```
