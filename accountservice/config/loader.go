@@ -11,7 +11,7 @@ import (
 
 type springCloudConfig struct {
 	Name            string           `json:"name"`
-	Profiles        string           `json:"profiles"`
+	Profiles        []string           `json:"profiles"`
 	Label           string           `json:"label"`
 	Version         string           `json:"version"`
 	PropertySources []propertySource `json:"propertySources"`

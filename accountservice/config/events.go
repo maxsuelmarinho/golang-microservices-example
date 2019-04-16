@@ -48,7 +48,7 @@ func StartListener(appName string, amqpServer string, exchangeName string) {
 	select{}
 }
 
-func newConsumer(amqpURI, exchangeName, exchangeType, queue, key, ctag string) error {
+func newConsumer(amqpURI, exchange, exchangeType, queue, key, ctag string) error {
 	c := &consumer{
 		conn: nil,
 		channel: nil,
@@ -119,7 +119,7 @@ func newConsumer(amqpURI, exchangeName, exchangeType, queue, key, ctag string) e
 		nil, // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("queue consume: %s", err
+		return fmt.Errorf("queue consume: %s", err)
 	}
 
 	go handle(deliveries, c.done)
@@ -140,7 +140,7 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 }
 
 func handleRefreshEvent(body []byte, consumerTag string) {
-	updateToken := &UpdateToken{}
+	updateToken := &updateToken{}
 	err := json.Unmarshal(body, updateToken)
 	if err != nil {
 		log.Printf("error parsing update token: %v", err.Error())

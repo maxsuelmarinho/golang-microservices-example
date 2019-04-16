@@ -6,6 +6,7 @@ require (
 	github.com/pelletier/go-toml v1.3.0 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a
 	github.com/spf13/viper v1.3.2
+	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 	github.com/stretchr/testify v1.3.0
 	gopkg.in/h2non/gock.v1 v1.0.14
 )

@@ -18,7 +18,7 @@ func init() {
 	configBranch := flag.String("configBranch", "master", "git branch to fetch configuration from")
 	flag.Parse()
 
-	fmt.Printf("Specified configBranch: %s\n", configBranch)
+	fmt.Printf("Specified configBranch: %s\n", *configBranch)
 
 	viper.Set("profile", *profile)
 	viper.Set("config_server_url", *configServerURL)
