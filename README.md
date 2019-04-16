@@ -163,6 +163,12 @@ docker service scale account-service=4
 docker stack deploy --compose-file docker-compose.yml stackdemo
 ```
 
+**List stacks**
+
+```
+docker stack ls
+```
+
 **Stack status**
 
 ```
@@ -226,23 +232,23 @@ keytool -genkeypair \
   -dname "CN=Microservices Example,OU=Unit,O=Organization,L=City,S=State,C=BR" \
   -keypass changeme \
   -keystore server.jks \
-  -storepass letmein
+  -storepass letmein \
   -validity 730
 ```
 
 **Encrypt data**
 
 ```
-curl -ks https://<config-user>:<config-password>@localhost:8888/encrypt -d my-data
+curl -ks https://<config-user>:<config-password>@localhost:8888/encrypt -d 'my-data'
 ```
 
 **Decrypt data**
 
 ```
-curl -ks https://<config-user>:<config-password>@localhost:8888/decrypt -d acbf87acb77acbf9879
+curl -ks https://<config-user>:<config-password>@localhost:8888/decrypt -d 'acbf87acb77acbf9879'
 ```
 
-**Encrypt property**
+**Encrypted property**
 
 ```
 my.secret.property='{cipher}acbf87acb77acbf9879'
