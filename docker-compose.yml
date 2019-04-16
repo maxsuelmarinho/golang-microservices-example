@@ -20,9 +20,11 @@ services:
     depends_on: 
       - quotes-service
       - config-server
+      - rabbitmq
     links:
       - quotes-service
       - config-server
+      - rabbitmq
 
   quotes-service:
     build:
@@ -67,5 +69,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: "rabbitmq"
     ports:
       - "15672:15672"
+      - "5672:5672"
+    networks:
+      - my_network

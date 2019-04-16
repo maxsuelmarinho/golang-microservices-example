@@ -258,6 +258,6 @@ my.secret.property='{cipher}acbf87acb77acbf9879'
 
 ```
 curl -H "X-Github-Event: push" -H "Content-Type: application/json" \
-   -X POST -d '{"commits": [{"modified": ["account-service.yml"]}]}' \
+   -X POST -d '{"commits": [{"modified": ["accountservice-test.yml"]}]}' \
    -ks https://<config-user>:<config-password>@localhost:8888/monitor
 ```
