@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/dbclient"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/model"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/messaging"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/util"
 )
 
 type healthCheckResponse struct {
@@ -18,6 +20,7 @@ type healthCheckResponse struct {
 }
 
 var DBClient dbclient.IBoltClient
+var MessagingClient messaging.IMessagingClient
 var isHealthy = true
 var client = &http.Client{}
 
@@ -29,16 +32,17 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	account.ServedBy = getIP()
+	account.ServedBy = util.GetIP()
+
+	notifyVIP(account)
+
 	quote, err := getQuote()
 	if err == nil {
 		account.Quote = quote
 	}
+
 	data, _ := json.Marshal(account)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+	writeJsonResponse(w, http.StatusOK, data)
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -72,20 +76,6 @@ func writeJsonResponse(w http.ResponseWriter, status int, data []byte) {
 	w.Write(data)
 }
 
-func getIP() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return "error"
-	}
-
-	for _, address := range addrs {
-		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
-			return ipnet.IP.String()
-		}
-	}
-	panic("Unable to determine local IP address (non loopback). Exiting.")
-}
-
 func init() {
 	var transport http.RoundTripper = &http.Transport{
 		DisableKeepAlives: true,
@@ -104,5 +94,22 @@ func getQuote() (model.Quote, error) {
 		return quote, nil
 	}
 
-	return model.Quote{}, fmt.Errorf("Some error: %s", err.Error())
+	return model.Quote{}, fmt.Errorf("Some error")
+}
+
+func notifyVIP(account model.Account) {
+	if account.ID == "10000" {
+		go func(account model.Account) {
+			vipNotification := model.VipNotification{
+				AccountID: account.ID,
+				ReadAt:    time.Now().UTC().String(),
+			}
+			data, _ := json.Marshal(vipNotification)
+
+			err := MessagingClient.PublishOnQueue(data, "vipQueue")
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		}(account)
+	}
 }

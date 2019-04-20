@@ -1,6 +1,11 @@
 package util
 
-import "net"
+import (
+	"net"
+	"os"
+	"os/signal"
+	"syscall"
+)
 
 func GetIP() string {
 	addrs, err := net.InterfaceAddrs()
@@ -15,4 +20,15 @@ func GetIP() string {
 	}
 
 	return "127.0.0.1"
+}
+
+func HandleSigterm(handleExit func()) {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGTERM)
+	go func() {
+		<-c
+		handleExit()
+		os.Exit(1)
+	}()
 }

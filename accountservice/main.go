@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/config"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/dbclient"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/service"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/config"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/messaging"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/util"
 	"github.com/spf13/viper"
 )
 
@@ -25,6 +27,16 @@ func init() {
 	viper.Set("config_branch", *configBranch)
 }
 
+func initializeMessaging() {
+	if !viper.IsSet("amqp_server_url") {
+		panic("No 'amqp_server_url' set in configuration, cannot start")
+	}
+
+	service.MessagingClient = &messaging.MessagingClient{}
+	service.MessagingClient.ConnectToBroker(viper.GetString("amqp_server_url"))
+	service.MessagingClient.Subscribe(viper.GetString("config_event_bus"), "topic", appName, config.HandleRefreshEvent)
+}
+
 func main() {
 	fmt.Printf("Starting %v\n", appName)
 
@@ -35,8 +47,11 @@ func main() {
 		viper.GetString("config_branch"))
 
 	initializeBoltClient()
+	initializeMessaging()
 
-	go config.StartListener(appName, viper.GetString("amqp_server_url"), viper.GetString("config_event_bus"))
+	util.HandleSigterm(func() {
+		service.MessagingClient.Close()
+	})
 
 	service.StartWebServer(viper.GetString("server_port"))
 }

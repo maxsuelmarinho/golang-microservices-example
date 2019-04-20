@@ -74,7 +74,7 @@ func (bc *BoltClient) seedAccounts() {
 
 func (bc *BoltClient) QueryAccount(accountID string) (model.Account, error) {
 	account := model.Account{}
-
+	log.Printf("Querying account ID: %s\n", accountID)
 	err := bc.boltDB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(accountBucketName))
 

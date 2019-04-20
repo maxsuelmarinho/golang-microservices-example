@@ -40,6 +40,20 @@ services:
     networks:
       - my_network
 
+  vip-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile-vipservice
+    image: "maxsuelmarinho/golang-microservices-example:vipservice-0.0.1"
+    container_name: "vip-service"
+    environment:
+      - CONFIG_USER=${CONFIG_USER}
+      - CONFIG_PASSWORD=${CONFIG_PASSWORD}
+    ports:
+      - "9191:8080"
+    networks:
+      - my_network
+
   viz:
     image: "dockersamples/visualizer"
     container_name: "viz"
