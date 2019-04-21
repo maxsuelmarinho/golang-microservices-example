@@ -21,10 +21,22 @@ services:
       - quotes-service
       - config-server
       - rabbitmq
+      - logstash
     links:
       - quotes-service
       - config-server
       - rabbitmq
+      - logstash
+    logging:
+      driver: "gelf"
+      options:
+        gelf-address: "udp://localhost:12201"
+        gelf-compression-type: "none"
+        tag: "accountservice"
+    #log_driver: "gelf"
+    #log_opt:
+    #  gelf-address: "udp://peon:12202"
+    #  gelf-compression-type: "none"
 
   quotes-service:
     build:
@@ -89,3 +101,43 @@ services:
       - "5672:5672"
     networks:
       - my_network
+
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:5.3.0
+    command: logstash -f /usr/share/logstash/pipeline/ --config.reload.automatic
+    ports:
+      - "12201:12201/udp"
+      - "5044:5044"
+    environment: 
+      - "xpack.monitoring.elasticsearch.url=http://elasticsearch:9200"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    links:
+      - elasticsearch
+    depends_on: 
+      - elasticsearch
+  
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:5.3.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      XPACK_SECURITY_ENABLED: "false"
+    links:
+      - elasticsearch
+    depends_on: 
+      - elasticsearch
+  
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.io/elasticsearch/elasticsearch:5.3.0
+    ports:
+      - "9200:9200"
+    environment: 
+      - "http.host=0.0.0.0"
+      - "transport.host=127.0.0.1"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      - "xpack.security.enabled=false"
