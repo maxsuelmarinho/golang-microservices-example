@@ -13,6 +13,7 @@ import (
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/model"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/messaging"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/util"
+	"github.com/sirupsen/logrus"
 )
 
 type healthCheckResponse struct {
@@ -28,7 +29,7 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 	var accountID = mux.Vars(r)["accountId"]
 	account, err := DBClient.QueryAccount(accountID)
 	if err != nil {
-		fmt.Printf("Some error occured serving %s: %s", accountID, err.Error())
+		logrus.Errorf("Some error occured serving %s: %s", accountID, err.Error())
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -60,7 +61,7 @@ func SetHealthyState(w http.ResponseWriter, r *http.Request) {
 	var state, err = strconv.ParseBool(mux.Vars(r)["state"])
 
 	if err != nil {
-		fmt.Println("Invalid request to SetHealthyState, allowed values are true or false")
+		logrus.Errorf("Invalid request to SetHealthyState, allowed values are true or false")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -108,7 +109,7 @@ func notifyVIP(account model.Account) {
 
 			err := MessagingClient.PublishOnQueue(data, "vipQueue")
 			if err != nil {
-				fmt.Println(err.Error())
+				logrus.Error(err.Error())
 			}
 		}(account)
 	}

@@ -5,9 +5,11 @@ import (
 	"fmt"
 
 	"github.com/maxsuelmarinho/golang-microservices-example/common/config"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/logging"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/messaging"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/util"
 	"github.com/maxsuelmarinho/golang-microservices-example/vipservice/service"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/streadway/amqp"
 )
@@ -19,8 +21,9 @@ func init() {
 	configServerUrl := flag.String("config_server_url", "http://config-server:8888", "Address to config server")
 	profile := flag.String("profile", "test", "Environment profile, something similar to spring profiles")
 	configBranch := flag.String("config_branch", "master", "git branch to fetch configuration from")
-
 	flag.Parse()
+
+	logging.InitializeLogrus(*profile)
 
 	viper.Set("profile", *profile)
 	viper.Set("config_server_url", *configServerUrl)
@@ -28,7 +31,7 @@ func init() {
 }
 
 func main() {
-	fmt.Printf("Starting %s...\n", appName)
+	logrus.Infof("Starting %s...\n", appName)
 
 	config.LoadConfigurationFromBranch(viper.GetString("config_server_url"), appName, viper.GetString("profile"), viper.GetString("config_branch"))
 	initializeMessaging()
@@ -43,7 +46,7 @@ func main() {
 }
 
 func onMessage(delivery amqp.Delivery) {
-	fmt.Printf("Got a message: %v\n", string(delivery.Body))
+	logrus.Infof("Got a message: %v\n", string(delivery.Body))
 }
 
 func initializeMessaging() {
@@ -63,7 +66,7 @@ func initializeMessaging() {
 func failOnError(err error, msg string) {
 	if err != nil {
 		message := fmt.Sprintf("%s: %s\n", msg, err)
-		fmt.Println(message)
+		logrus.Error(message)
 		panic(message)
 	}
 }

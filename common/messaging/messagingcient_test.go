@@ -1,9 +1,9 @@
 package messaging
 
 import (
-	"log"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/streadway/amqp"
 )
@@ -11,7 +11,7 @@ import (
 func TestMessageHandlerLoop(t *testing.T) {
 	var invocations = 0
 	var handlerFunction = func(d amqp.Delivery) {
-		log.Println("In handlerFunction")
+		logrus.Info("In handlerFunction")
 		invocations = invocations + 1
 	}
 	Convey("Given", t, func() {

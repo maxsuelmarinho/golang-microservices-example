@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/maxsuelmarinho/golang-microservices-example/quotes/model"
+	"github.com/sirupsen/logrus"
 )
 
 var quotes = [...]string{
@@ -31,12 +31,12 @@ func GetQuote(w http.ResponseWriter, r *http.Request) {
 
 	idx := rand.Intn(len(quotes))
 
-	fmt.Printf("Will pick no# %v of the %v quotes\n", idx, len(quotes))
+	logrus.Infof("Will pick no# %v of the %v quotes\n", idx, len(quotes))
 	quote := quotes[idx]
 	quoteObject := model.Quote{runtime.GOARCH, runtime.GOOS, hostname + "/" + addr, quote, "EN"}
 
 	data, _ := json.Marshal(quoteObject)
-	fmt.Printf("return string %v\n", string(data))
+	log.Infof("return string %v\n", string(data))
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
 	w.WriteHeader(http.StatusOK)
@@ -45,7 +45,7 @@ func GetQuote(w http.ResponseWriter, r *http.Request) {
 
 func GetHealth(w http.ResponseWriter, r *http.Request) {
 	data := []byte("{\"status\":\"UP\"}")
-	fmt.Printf("return string %v\n", string(data))
+	logrus.Infof("return string %v\n", string(data))
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
 	w.WriteHeader(http.StatusOK)

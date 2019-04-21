@@ -3,9 +3,9 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/streadway/amqp"
 )
@@ -26,7 +26,7 @@ func (c *consumer) Shutdown() error {
 		return fmt.Errorf("AMQP connection close error: %s", err)
 	}
 
-	defer log.Printf("AMQP shutdown OK")
+	defer logrus.Infof("AMQP shutdown OK")
 
 	return <-c.done
 }
@@ -42,10 +42,10 @@ type updateToken struct {
 func StartListener(appName string, amqpServer string, exchangeName string) {
 	err := newConsumer(amqpServer, exchangeName, "topic", "config-event-queue", exchangeName, appName)
 	if err != nil {
-		log.Fatalf("%s", err)
+		logrus.Fatalf("%s", err)
 	}
 
-	log.Printf("running forever")
+	logrus.Infof("running forever")
 	select {}
 }
 
@@ -59,19 +59,19 @@ func newConsumer(amqpURI, exchange, exchangeType, queue, key, ctag string) error
 
 	var err error
 
-	log.Printf("dialing %s\n", amqpURI)
+	logrus.Infof("dialing %s\n", amqpURI)
 	c.conn, err = amqp.Dial(amqpURI)
 	if err != nil {
 		return fmt.Errorf("Dial: %s", err)
 	}
 
-	log.Println("got connection, getting channel")
+	logrus.Infof("got connection, getting channel")
 	c.channel, err = c.conn.Channel()
 	if err != nil {
 		return fmt.Errorf("Channel: %s", err)
 	}
 
-	log.Printf("go channel, declaring exchange (%s)\n", exchange)
+	logrus.Infof("go channel, declaring exchange (%s)\n", exchange)
 	if err = c.channel.ExchangeDeclare(
 		exchange,
 		exchangeType,
@@ -84,7 +84,7 @@ func newConsumer(amqpURI, exchange, exchangeType, queue, key, ctag string) error
 		return fmt.Errorf("exchange declare: %s", err)
 	}
 
-	log.Printf("declared exchange, declaring queue (%s)\n", queue)
+	logrus.Infof("declared exchange, declaring queue (%s)\n", queue)
 	state, err := c.channel.QueueDeclare(
 		queue,
 		false, // durable
@@ -97,7 +97,7 @@ func newConsumer(amqpURI, exchange, exchangeType, queue, key, ctag string) error
 		return fmt.Errorf("Queue declare: %s", err)
 	}
 
-	log.Printf("declared queue (%d messages, %d consumers), binding to exchange (key '%s'", state.Messages, state.Consumers, key)
+	logrus.Infof("declared queue (%d messages, %d consumers), binding to exchange (key '%s'", state.Messages, state.Consumers, key)
 
 	if err = c.channel.QueueBind(
 		queue,    // name of the queue
@@ -109,7 +109,7 @@ func newConsumer(amqpURI, exchange, exchangeType, queue, key, ctag string) error
 		return fmt.Errorf("Queue bind: %s", err)
 	}
 
-	log.Printf("queue bound to exchange, starting consume (consumer tag '%s')", c.tag)
+	logrus.Infof("queue bound to exchange, starting consume (consumer tag '%s')", c.tag)
 	deliveries, err := c.channel.Consume(
 		queue,
 		c.tag, //consumerTag
@@ -130,13 +130,13 @@ func newConsumer(amqpURI, exchange, exchangeType, queue, key, ctag string) error
 
 func handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
-		log.Printf("got %dB consumer: [%v] delivery: [%v] routingKey: [%v] %s", len(d.Body), d.ConsumerTag, d.DeliveryTag, d.RoutingKey, d.Body)
+		logrus.Infof("got %dB consumer: [%v] delivery: [%v] routingKey: [%v] %s", len(d.Body), d.ConsumerTag, d.DeliveryTag, d.RoutingKey, d.Body)
 
 		handleRefreshEvent(d.Body, d.ConsumerTag)
 		d.Ack(false)
 	}
 
-	log.Printf("handle: deliveries channel closed")
+	logrus.Infof("handle: deliveries channel closed")
 	done <- nil
 }
 
@@ -146,12 +146,12 @@ func handleRefreshEvent(d amqp.Delivery) {
 	updateToken := &updateToken{}
 	err := json.Unmarshal(body, updateToken)
 	if err != nil {
-		log.Printf("error parsing update token: %v", err.Error())
+		logrus.Errorf("error parsing update token: %v", err.Error())
 		return
 	}
 
 	if strings.Contains(updateToken.DestinationService, consumerTag) {
-		log.Println("reloading viper config from spring cloud config server")
+		logrus.Info("reloading viper config from spring cloud config server")
 
 		LoadConfigurationFromBranch(
 			viper.GetString("config_server_url"),

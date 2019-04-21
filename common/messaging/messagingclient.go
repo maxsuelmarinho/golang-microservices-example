@@ -2,8 +2,8 @@ package messaging
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
@@ -83,7 +83,7 @@ func (m *MessagingClient) Publish(body []byte, exchangeName string, exchangeType
 
 	failOnError(err, "Failed to publish a message")
 
-	fmt.Printf("A message was sent: %v\n", body)
+	logrus.Infof("A message was sent: %v\n", body)
 	return err
 }
 
@@ -115,7 +115,7 @@ func (m *MessagingClient) PublishOnQueue(body []byte, queueName string) error {
 			Body:        body,
 		},
 	)
-	fmt.Printf("A message was sent to queue: %v: %v\n", queueName, body)
+	logrus.Infof("A message was sent to queue: %v: %v\n", queueName, body)
 	return err
 }
 
@@ -135,7 +135,7 @@ func (m *MessagingClient) Subscribe(exchangeName string, exchangeType string, co
 
 	failOnError(err, "Failed to register an Exchange")
 
-	log.Printf("declared exchange, declaring queue (%s)", "")
+	logrus.Infof("declared exchange, declaring queue (%s)", "")
 	queue, err := ch.QueueDeclare(
 		"",    // queue name
 		false, // durable
@@ -147,7 +147,7 @@ func (m *MessagingClient) Subscribe(exchangeName string, exchangeType string, co
 
 	failOnError(err, "Failed to register a Queue")
 
-	log.Printf("declared queue (%d messages, %d consumers), binding to exchange (key '%s')", queue.Messages, queue.Consumers, exchangeName)
+	logrus.Infof("declared queue (%d messages, %d consumers), binding to exchange (key '%s')", queue.Messages, queue.Consumers, exchangeName)
 
 	err = ch.QueueBind(
 		queue.Name,   // queue name
@@ -179,7 +179,7 @@ func (m *MessagingClient) SubscribeToQueue(queueName string, consumerName string
 	ch, err := m.conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
-	log.Printf("Declaring queue (%s)", queueName)
+	logrus.Infof("Declaring queue (%s)", queueName)
 	queue, err := ch.QueueDeclare(
 		queueName,
 		false, // durable
@@ -222,7 +222,7 @@ func consumeLoop(deliveries <-chan amqp.Delivery, handlerFunc func(d amqp.Delive
 func failOnError(err error, msg string) {
 	if err != nil {
 		message := fmt.Sprintf("%s: %s", msg, err)
-		fmt.Println(message)
+		logrus.Error(message)
 		panic(message)
 	}
 }

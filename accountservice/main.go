@@ -2,13 +2,14 @@ package main
 
 import (
 	"flag"
-	"fmt"
 
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/dbclient"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/service"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/config"
+	"github.com/maxsuelmarinho/golang-microservices-example/common/logging"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/messaging"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/util"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -20,7 +21,8 @@ func init() {
 	configBranch := flag.String("configBranch", "master", "git branch to fetch configuration from")
 	flag.Parse()
 
-	fmt.Printf("Specified configBranch: %s\n", *configBranch)
+	logging.InitializeLogrus(*profile)
+	logrus.Infof("Specified configBranch: %s\n", *configBranch)
 
 	viper.Set("profile", *profile)
 	viper.Set("config_server_url", *configServerURL)
@@ -38,7 +40,7 @@ func initializeMessaging() {
 }
 
 func main() {
-	fmt.Printf("Starting %v\n", appName)
+	logrus.Infof("Starting %v\n", appName)
 
 	config.LoadConfigurationFromBranch(
 		viper.GetString("config_server_url"),

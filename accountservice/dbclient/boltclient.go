@@ -10,6 +10,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/model"
+	"github.com/sirupsen/logrus"
 )
 
 const accountBucketName = "AccountBucket"
@@ -69,12 +70,12 @@ func (bc *BoltClient) seedAccounts() {
 			return err
 		})
 	}
-	fmt.Printf("Seeded %v fake accounts...\n", total)
+	logrus.Infof("Seeded %v fake accounts...\n", total)
 }
 
 func (bc *BoltClient) QueryAccount(accountID string) (model.Account, error) {
 	account := model.Account{}
-	log.Printf("Querying account ID: %s\n", accountID)
+	logrus.Infof("Querying account ID: %s\n", accountID)
 	err := bc.boltDB.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(accountBucketName))
 
