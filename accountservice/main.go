@@ -5,6 +5,7 @@ import (
 
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/dbclient"
 	"github.com/maxsuelmarinho/golang-microservices-example/accountservice/service"
+	cb "github.com/maxsuelmarinho/golang-microservices-example/common/circuitbreaker"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/config"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/logging"
 	"github.com/maxsuelmarinho/golang-microservices-example/common/messaging"
@@ -50,11 +51,12 @@ func main() {
 
 	initializeBoltClient()
 	initializeMessaging()
+	cb.ConfigureHystrix([]string{"image-service", "quotes-service"}, service.MessagingClient)
 
 	util.HandleSigterm(func() {
+		cb.Deregister(service.MessagingClient)
 		service.MessagingClient.Close()
 	})
-
 	service.StartWebServer(viper.GetString("server_port"))
 }
 

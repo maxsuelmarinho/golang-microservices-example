@@ -132,7 +132,7 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 	for d := range deliveries {
 		logrus.Infof("got %dB consumer: [%v] delivery: [%v] routingKey: [%v] %s", len(d.Body), d.ConsumerTag, d.DeliveryTag, d.RoutingKey, d.Body)
 
-		handleRefreshEvent(d.Body, d.ConsumerTag)
+		HandleRefreshEvent(d)
 		d.Ack(false)
 	}
 
@@ -140,7 +140,7 @@ func handle(deliveries <-chan amqp.Delivery, done chan error) {
 	done <- nil
 }
 
-func handleRefreshEvent(d amqp.Delivery) {
+func HandleRefreshEvent(d amqp.Delivery) {
 	body := d.Body
 	consumerTag := d.ConsumerTag
 	updateToken := &updateToken{}

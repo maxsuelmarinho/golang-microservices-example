@@ -66,6 +66,20 @@ services:
     networks:
       - my_network
 
+  image-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile-imageservice
+    image: "maxsuelmarinho/golang-microservices-example:imageservice-0.0.1"
+    container_name: "image-service"
+    environment:
+      - CONFIG_USER=${CONFIG_USER}
+      - CONFIG_PASSWORD=${CONFIG_PASSWORD}
+    ports:
+      - "9292:8080"
+    networks:
+      - my_network
+
   viz:
     image: "dockersamples/visualizer"
     container_name: "viz"

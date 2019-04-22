@@ -131,9 +131,18 @@ docker network create --driver overlay my_network
 **Deploying the Account Service**
 
 ```
-docker service create --name=account-service --replicas=1 --network=my_network -p=8080:8080 maxsuelmarinho/golang-microservices-example:accountservice-0.0.1
+docker service create \
+   --name=account-service \
+   --replicas=1 \
+   --network=my_network \
+   --log-driver=gelf \
+   --log-opt gelf-address=udp://<host>:<port> \
+   --log-opt gelf-compression-type=none
+   -p=8080:8080 maxsuelmarinho/golang-microservices-example:accountservice-0.0.1
 
 docker service create --name=quotes-service --replicas=1 --network=my_network -p=9090:8080 maxsuelmarinho/golang-microservices-example:quotesservice-0.0.1
+
+docker service create --name=gelftail -p=12201:12201/udp --replicas=1 --network=my_network maxsuelmarinho/golang-microservices-example:gelftail-0.0.1
 ```
 
 **Service status**

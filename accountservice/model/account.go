@@ -9,6 +9,7 @@ type Account struct {
 	Name     string `json:"name"`
 	ServedBy string `json:"servedBy"`
 	Quote    Quote  `json:"quote"`
+	ImageURL string `json:"imageUrl"`
 }
 
 type Quote struct {
@@ -18,5 +19,5 @@ type Quote struct {
 }
 
 func (a *Account) ToString() string {
-	return fmt.Sprintf("%s %s %s", a.ID, a.Name, a.ServedBy)
+	return fmt.Sprintf("%s %s %s %s", a.ID, a.Name, a.ServedBy, a.ImageURL)
 }

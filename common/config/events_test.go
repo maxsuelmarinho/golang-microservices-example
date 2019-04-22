@@ -6,6 +6,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/viper"
 	"github.com/streadway/amqp"
+	gock "gopkg.in/h2non/gock.v1"
 )
 
 const ServiceName = "accountservice"
@@ -25,7 +26,8 @@ func TestHandleRefreshEvent(t *testing.T) {
 		var body = `{"type":"RefreshRemoteApplicationEvent", "timestamp": 1494514362123, "originService": "config-server:docker:8888", "destinationService": "accountservice:**", "id": "53e61c71-cbae-4b6d-84bb-d0dcc0aeb4dc"}`
 
 		Convey("When handled", func() {
-			handleRefreshEvent([]byte(body), ServiceName)
+			d := amqp.Delivery{Body: []byte(body), ConsumerTag: ServiceName}
+			handleRefreshEvent(d)
 
 			Convey("Then Viper should have been re-populated with values from source", func() {
 				So(viper.GetString("server_name"), ShouldEqual, "Account Service RELOADED")

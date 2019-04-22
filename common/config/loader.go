@@ -37,7 +37,7 @@ func LoadConfigurationFromBranch(configServerURL string, appName string, profile
 func fetchConfiguration(url string) ([]byte, error) {
 	defer func() {
 		if r := recover(); r != nil {
-			logrus.Infof("Recovered in f", r)
+			logrus.Infof("Recovered in %v\n", r)
 		}
 	}()
 
@@ -45,12 +45,16 @@ func fetchConfiguration(url string) ([]byte, error) {
 
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != 200 {
-		panic("Couldn't load configuration, cannot start. Terminating. Error: " + err.Error())
+		message := fmt.Sprintf("Couldn't load configuration, cannot start. Terminating. Error: %v", err.Error())
+		logrus.Errorln(message)
+		panic(message)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic("Error reading configuration: " + err.Error())
+		message := fmt.Sprintf("Error reading configuration: %v", err.Error())
+		logrus.Errorln(message)
+		panic(message)
 	}
 	return body, err
 }
@@ -59,7 +63,9 @@ func parseConfiguration(body []byte) {
 	var cloudConfig springCloudConfig
 	err := json.Unmarshal(body, &cloudConfig)
 	if err != nil {
-		panic("Cannot parse configuration, message: " + err.Error())
+		message := fmt.Sprintf("Cannot parse configuration, message: %v", err.Error())
+		logrus.Errorln(message)
+		panic(message)
 	}
 
 	for key, value := range cloudConfig.PropertySources[0].Source {

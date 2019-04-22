@@ -42,7 +42,7 @@ func GetIPWithPrefix(prefix string) string {
 	return "127.0.0.1"
 }
 
-func ResolveIPFromHostFile() (string, error) {
+func ResolveIPFromHostsFile() (string, error) {
 	data, err := ioutil.ReadFile("/etc/hosts")
 	if err != nil {
 		logrus.Errorf("Problem reading /etc/hosts: %v", err.Error())
