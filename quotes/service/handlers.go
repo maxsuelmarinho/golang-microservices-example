@@ -36,7 +36,7 @@ func GetQuote(w http.ResponseWriter, r *http.Request) {
 	quoteObject := model.Quote{runtime.GOARCH, runtime.GOOS, hostname + "/" + addr, quote, "EN"}
 
 	data, _ := json.Marshal(quoteObject)
-	log.Infof("return string %v\n", string(data))
+	logrus.Infof("return string %v\n", string(data))
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
 	w.WriteHeader(http.StatusOK)

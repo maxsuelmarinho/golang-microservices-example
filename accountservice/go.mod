@@ -1,13 +1,16 @@
 module github.com/maxsuelmarinho/golang-microservices-example/accountservice
 
 require (
+	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5 // indirect
 	github.com/boltdb/bolt v1.3.1
 	github.com/coreos/etcd v3.3.12+incompatible // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
+	github.com/eapache/go-resiliency v1.1.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190411002643-bd77b112433e // indirect
 	github.com/gorilla/mux v1.7.1
-	github.com/maxsuelmarinho/golang-microservices-example v0.0.0-20190420150248-45bcd7f02b8c
+	github.com/maxsuelmarinho/golang-microservices-example v0.0.0-20190422040618-9f4933bcf873
 	github.com/pelletier/go-toml v1.3.0 // indirect
+	github.com/sirupsen/logrus v1.4.1
 	github.com/smartystreets/assertions v0.0.0-20190401211740-f487f9de1cd3 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a
 	github.com/spf13/afero v1.2.2 // indirect

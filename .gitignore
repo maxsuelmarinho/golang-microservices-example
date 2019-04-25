@@ -1,5 +1,7 @@
 # Golang project
 accountservice/accounts.db
+quotes/quotes
+vipservice/vipservice
 
 # Node.js project
 # Logs
