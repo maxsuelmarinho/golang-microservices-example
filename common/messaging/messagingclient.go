@@ -115,7 +115,7 @@ func (m *MessagingClient) PublishOnQueue(body []byte, queueName string) error {
 			Body:        body,
 		},
 	)
-	logrus.Infof("A message was sent to queue: %v: %v\n", queueName, body)
+	logrus.Infof("A message was sent to queue: %v: %v\n", queueName, string(body))
 	return err
 }
 

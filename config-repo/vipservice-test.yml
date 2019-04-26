@@ -1,0 +1,4 @@
+server_port: 8080
+server_name: VIP Service TEST
+amqp_server_url: amqp://guest:guest@rabbitmq:5672/
+config_event_bus: springCloudBus
