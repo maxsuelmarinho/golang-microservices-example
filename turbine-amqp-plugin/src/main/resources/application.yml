@@ -1,0 +1,43 @@
+#server:
+#  port: 9000
+
+spring:
+  application:
+    name: turbine-stream
+  cloud:
+    bus:
+      trace:
+        enabled: true
+  rabbitmq:
+    host: peon
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  endpoint:
+    health:
+      enabled: true
+      show-details: "always"
+  endpoints:
+    jmx:
+      exposure:
+        include: "*"
+    web:
+      exposure:
+        include: "*"
+      base-path: "/actuator"
+      cors:
+        allowed-origins: true
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+
+turbineamqpplugin:
+  uri-template: "http://{HOSTNAME}/turbine.stream"
+  discovery-queue: "discovery"
+  cluster-name: "swarm"
+  consumer-tag: "myConsumerTag"
+
