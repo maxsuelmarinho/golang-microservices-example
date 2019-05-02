@@ -121,7 +121,7 @@ func notifyVIP(account model.Account) {
 }
 
 func getImageURL(accountID string) string {
-	body, err := cb.CallUsingCircuitBreaker("image-service", fmt.Sprintf("http://image-service:7777/accounts/%s", accountID), "GET")
+	body, err := cb.CallUsingCircuitBreaker("image-service", fmt.Sprintf("http://image-service:8080/accounts/%s", accountID), "GET")
 	if err == nil {
 		return string(body)
 	} else {
