@@ -40,10 +40,13 @@ jar {
 dependencies {
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.cloud:spring-cloud-config-server'
 	implementation 'org.springframework.cloud:spring-cloud-config-monitor'
 	implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 	//implementation 'org.springframework.cloud:spring-cloud-starter-consul-config'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
