@@ -8,11 +8,14 @@ VOLUME /app/logs
 VOLUME /app/config
 
 RUN apk update && \
-    apk add --no-cache bash gettext
+    apk add --no-cache bash gettext curl
 
 ADD config-server-*.jar /app/app.jar
 RUN sh -c 'touch /app/app.jar'
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
-EXPOSE 8080
+
+HEALTHCHECK --interval=10s --timeout=10s CMD [ "curl", "--silent", "--fail", "localhost:8888/actuator/health" ] || exit 1
+
+EXPOSE 8888
 ENTRYPOINT ["/docker-entrypoint.sh"]
