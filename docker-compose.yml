@@ -19,6 +19,7 @@ services:
       - my_network
     depends_on: 
       - quotes-service
+      - image-service
       - config-server
       - rabbitmq
       - logstash
@@ -27,12 +28,12 @@ services:
       - config-server
       - rabbitmq
       - logstash
-    logging:
-      driver: "gelf"
-      options:
-        gelf-address: "udp://peon:12201"
-        #gelf-compression-type: "none"
-        tag: "accountservice"
+    #logging:
+    #  driver: "gelf"
+    #  options:
+    #    gelf-address: "udp://peon:12201"
+    #    #gelf-compression-type: "none"
+    #    tag: "accountservice"
 
   quotes-service:
     build:
@@ -45,6 +46,7 @@ services:
       - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
       - "9090:8080"
+      - "7272:8181"
     networks:
       - my_network
     logging:
@@ -64,6 +66,7 @@ services:
       - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
       - "9191:8080"
+      - "7373:8181"
     networks:
       - my_network
     logging:
@@ -83,6 +86,7 @@ services:
       - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
       - "9292:8080"
+      - "7474:8181"
     networks:
       - my_network
     logging:
@@ -107,6 +111,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker,native
       - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config-repo
+      - HEAP_OPTS=-Xms64M -Xmx64M
       #- SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME=${CONFIG_SERVER_GIT_USERNAME}
       #- SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=${CONFIG_SERVER_GIT_PASSWORD}
       #- SECURITY_USER_NAME=${CONFIG_USER}
@@ -117,6 +122,48 @@ services:
       - "8888:8888"
     networks:
       - my_network
+    depends_on: 
+      - rabbitmq
+    links:
+      - rabbitmq
+
+  eureka-server:
+    image: maxsuelmarinho/microservices-example:eureka-server-0.0.1
+    container_name: eureka-server
+    environment:
+      - HEAP_OPTS=-Xms64M -Xmx64M
+    ports:
+      - "8761:8761"
+    networks:
+      - my_network
+  
+  turbine-amqp:
+    image: maxsuelmarinho/microservices-example:turbine-amqp-plugin-0.0.1
+    container_name: turbine-amqp
+    environment:
+      - HEAP_OPTS=-Xms64M -Xmx64M
+    ports:
+      - "8282:8282"
+    networks:
+      - my_network      
+    links:
+      - account-service
+
+  # http://localhost:9000/hystrix/
+  # http://localhost:8282/turbine.stream
+  hystrix-dashboard:
+    image: maxsuelmarinho/microservices-example:hystrix-dashboard-0.0.1
+    container_name: hystrix-dashboard
+    environment:
+      - HEAP_OPTS=-Xms64M -Xmx64M
+    ports:
+      - "9000:9000"
+    networks:
+      - my_network
+    depends_on: 
+      - turbine-amqp
+    links: 
+      - turbine-amqp
 
   rabbitmq:
     image: rabbitmq:3-management
