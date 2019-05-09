@@ -1,4 +1,4 @@
-server_port: 8080
+server_port: 9090
 server_name: Account Service DEV
 amqp_server_url: amqp://guest:guest@rabbitmq:5672/
 config_event_bus: springCloudBus

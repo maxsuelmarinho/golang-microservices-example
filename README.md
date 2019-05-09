@@ -277,3 +277,23 @@ curl -H "X-Github-Event: push" -H "Content-Type: application/json" \
 go get -u github.com/vektra/mockery/.../
 mockery -all -output .
 ```
+
+## Zipkin
+
+**Query for a specific HTTP request URI**
+
+```
+curl http://localhost:9411/api/v1/traces?annotationQuery="http.path=accounts/10000" | jq
+```
+
+**Searching for a specific Trace Id**
+
+```
+curl http://localhost:9411/api/v1/trace/<trace-id> | jq
+```
+
+**Lookup all traces where a specific microservice has been involved**
+
+```
+curl http://localhost:9411/api/v1/traces?serviceName=account-service | jq
+```

@@ -14,7 +14,7 @@ services:
     #  - CONFIG_USER=${CONFIG_USER}
     #  - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
-      - "8080:8080"
+      - "9090:9090"
     networks:
       - my_network
     depends_on: 
@@ -213,3 +213,27 @@ services:
       - "transport.host=127.0.0.1"
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "xpack.security.enabled=false"
+
+  zipkin-server:
+    image: openzipkin/zipkin
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
+    environment: 
+      - HEAP_OPTS=-Xms64M -Xmx64M
+    networks: 
+      - my_network
+
+  edge-server:
+    image: maxsuelmarinho/microservices-example:edge-server-0.0.1
+    container_name: edge-server
+    ports:
+      - "8080:8080"
+    environment: 
+      - HEAP_OPTS=-Xms64M -Xmx64M
+    networks: 
+      - my_network
+    depends_on: 
+      - account-service
+    links:
+      - account-service
