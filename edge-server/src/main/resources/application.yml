@@ -1,0 +1,75 @@
+server:
+  port: 8080
+  ssl:
+    key-store: classpath:server.jks
+    key-store-password: letmein
+    key-password: changeme
+
+spring:
+  application:
+    name: edge-server
+  zipkin:
+    enabled: true
+    baseUrl: http://zipkin-server:9411
+  sleuth:
+    sampler:
+      percentage: 1.0 # Collect the ratio of tracking information. If it is 0.1, it means only 10% of the tracking data is recorded. If you want to track all, set it to 1 (the actual scene is not recommended, because it will cause a lot of performance)
+sample:
+  zipkin:
+    enabled: true
+
+security:
+  basic:
+    enabled: false # Disable Spring Boot basic authentication
+
+management:
+  security:
+    enabled: false
+  endpoint:
+    health:
+      enabled: true
+      show-details: "always"
+  endpoints:
+    jmx:
+      exposure:
+        include: "*"
+    web:
+      exposure:
+        include: "*"
+      base-path: "/actuator"
+      cors:
+        allowed-origins: true
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 100 # Maximum number of concurrent requests when using thread pools (Default: 10)
+      maxQueueSize: -1 # Maximum LinkedBlockingQueue size - -1 for using SynchronousQueue (Default: -1)
+      queueSizeRejectionThreshold: 5 # Queue size rejection threshold (Default: 5)
+  command:
+    default:
+      circuitBreaker:
+        sleepWindowInMilliseconds: 30000
+        requestVolumeThreshold: 20
+      execution:
+        isolation:
+          #strategy: SEMAPHORE # no thread pool but timeout handling stops to work
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 10000
+
+zuul:
+  ignoredServices: "*"
+  prefix: /api
+  routes:
+    accountservice:
+      path: /accounts/**
+      url: http://accountservice:8080/accounts
+    accountservicehealth:
+      path: /accounts/health
+      url: http://accountservice:8080/health
