@@ -45,7 +45,7 @@ services:
       - CONFIG_USER=${CONFIG_USER}
       - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
-      - "9090:8080"
+      - "9191:8080"
       - "7272:8181"
     networks:
       - my_network
@@ -65,7 +65,7 @@ services:
       - CONFIG_USER=${CONFIG_USER}
       - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
-      - "9191:8080"
+      - "9292:8080"
       - "7373:8181"
     networks:
       - my_network
@@ -85,7 +85,7 @@ services:
       - CONFIG_USER=${CONFIG_USER}
       - CONFIG_PASSWORD=${CONFIG_PASSWORD}
     ports:
-      - "9292:8080"
+      - "9393:8080"
       - "7474:8181"
     networks:
       - my_network
@@ -215,14 +215,15 @@ services:
       - "xpack.security.enabled=false"
 
   zipkin-server:
-    image: openzipkin/zipkin
+    #image: openzipkin/zipkin
+    image: maxsuelmarinho/microservices-example:zipkin-server-0.0.1
     container_name: zipkin-server
     ports:
       - "9411:9411"
     environment: 
       - HEAP_OPTS=-Xms64M -Xmx64M
     networks: 
-      - my_network
+      - my_network      
 
   edge-server:
     image: maxsuelmarinho/microservices-example:edge-server-0.0.1

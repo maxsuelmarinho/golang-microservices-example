@@ -15,7 +15,7 @@ RUN sh -c 'touch /app/app.jar'
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-HEALTHCHECK --interval=10s --timeout=10s CMD [ "curl", "--silent", "--fail", "localhost:9090/actuator/health" ] || exit 1
+HEALTHCHECK --interval=10s --timeout=10s CMD [ "curl", "--silent", "--fail", "-k", "https://localhost:8080/actuator/health" ] || exit 1
 
-EXPOSE 9090
+EXPOSE 8080
 ENTRYPOINT ["/docker-entrypoint.sh"]

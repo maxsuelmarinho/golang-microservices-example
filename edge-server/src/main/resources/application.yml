@@ -69,7 +69,7 @@ zuul:
   routes:
     accountservice:
       path: /accounts/**
-      url: http://accountservice:8080/accounts
+      url: http://account-service:8080/accounts
     accountservicehealth:
       path: /accounts/health
-      url: http://accountservice:8080/health
+      url: http://account-service:8080/health

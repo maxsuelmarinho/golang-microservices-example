@@ -17,7 +17,7 @@ COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /go/bin/accountservice-linux-amd64 /go/bin/accountservice-linux-amd64
 COPY --from=builder /go/bin/healthchecker-linux-amd64 /go/bin/healthchecker-linux-amd64
 
-HEALTHCHECK --interval=5s --timeout=5s CMD [ "/go/bin/healthchecker-linux-amd64", "-host=http://127.0.0.1:8080" ] || exit 1
+HEALTHCHECK --interval=5s --timeout=5s CMD [ "/go/bin/healthchecker-linux-amd64", "-host=http://127.0.0.1:9090" ] || exit 1
 
 USER appuser
 ENTRYPOINT ["/go/bin/accountservice-linux-amd64"]

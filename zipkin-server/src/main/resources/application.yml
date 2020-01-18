@@ -14,7 +14,7 @@ spring:
 #      trace:
 #        enabled: true
   rabbitmq:
-    host: peon
+    host: rabbitmq
     port: 5672
     username: guest
     password: guest
